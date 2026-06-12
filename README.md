@@ -1,12 +1,13 @@
-# ATS POC Playwright Automation
+# Hiremind Automation
 
-This folder contains a scalable Playwright automation framework for the ATS POC, written in TypeScript and organized with the Page Object Model.
+Playwright TypeScript automation framework for Hiremind, organized with the Page Object Model.
 
 ## Folder Structure
 
 ```text
-automation/
 ├── tests/
+│   ├── e2e/
+│   │   └── smoke.spec.ts
 │   └── login.spec.ts
 ├── pages/
 │   └── LoginPage.ts
@@ -22,25 +23,23 @@ automation/
 ## Prerequisites
 
 - Node.js installed
-- ATS frontend running locally, usually at `http://localhost:5173`
-- ATS backend running locally, usually at `http://localhost:4000`
+- Hiremind frontend running locally, usually at `http://localhost:5173`
+- Hiremind backend running locally, usually at `http://localhost:4000`
 - Valid login credentials seeded in the backend
 
-Default credentials used by the tests:
+Default credentials used by the login tests:
 
 ```text
 admin@demo.com / admin123
 ```
 
-You can override them with environment variables:
+Override credentials when needed:
 
 ```bash
 LOGIN_EMAIL="admin@demo.com" LOGIN_PASSWORD="admin123" npm test
 ```
 
-## Install Dependencies
-
-From the `automation` folder:
+## Setup
 
 ```bash
 npm install
@@ -61,13 +60,25 @@ Run tests in headed Chromium:
 npm run test:headed
 ```
 
+Run Playwright UI mode:
+
+```bash
+npm run test:ui
+```
+
+Type-check the framework:
+
+```bash
+npm run lint
+```
+
 Open the latest HTML report:
 
 ```bash
 npm run report
 ```
 
-## Configuration
+## Environment
 
 The default test base URL is:
 
@@ -78,21 +89,23 @@ http://localhost:5173
 Override it when needed:
 
 ```bash
-BASE_URL="https://your-ats-url.example" npm test
+BASE_URL="https://your-app-url.example" npm test
 ```
 
-The framework is configured to:
+## Framework Features
 
-- Run on Chromium
-- Generate HTML reports
-- Capture screenshots on failure
-- Retain videos on failure
-- Enable trace collection on retry
-- Avoid hardcoded waits
+- Page Object Model
+- Chromium execution
+- HTML reports
+- Screenshots on failure
+- Videos retained on failure
+- Trace collection on retry
+- No hardcoded waits
+- Test data separated from specs
 
 ## Adding New Modules
 
-For new ATS areas such as Dashboard, Jobs, Candidates, Pipeline, Interview, and Settings:
+For ATS areas such as Dashboard, Jobs, Candidates, Pipeline, Interview, and Settings:
 
 1. Add a page object in `pages/`, for example `DashboardPage.ts`.
 2. Store reusable data in `test-data/`.
@@ -100,4 +113,4 @@ For new ATS areas such as Dashboard, Jobs, Candidates, Pipeline, Interview, and 
 4. Add helpers in `utils/`.
 5. Add specs in `tests/`.
 
-Keep selectors accessible-first by preferring `getByRole`, `getByLabel`, and `getByTestId`.
+Prefer accessible selectors such as `getByRole`, `getByLabel`, and `getByTestId`.

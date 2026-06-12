@@ -1,5 +1,9 @@
 node_modules/
-playwright-report/
 test-results/
+playwright-report/
 blob-report/
+coverage/
 .env
+.env.*
+*.log
+.DS_Store
