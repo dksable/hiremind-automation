@@ -2,6 +2,15 @@ name: Playwright Validation
 
 on:
   workflow_dispatch:
+    inputs:
+      test_files:
+        description: Playwright test file(s) to execute
+        required: false
+        default: ""
+      validation_branch:
+        description: Validation branch to checkout
+        required: false
+        default: ""
   push:
     branches:
       - "aiqa/**"
@@ -13,6 +22,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.validation_branch || github.ref }}
 
       - name: Setup Node 20
         uses: actions/setup-node@v4
@@ -31,7 +42,12 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
-        run: npm test
+        run: |
+          if [ -n "${{ github.event.inputs.test_files }}" ]; then
+            npx playwright test ${{ github.event.inputs.test_files }} --reporter=json,html --workers=1
+          else
+            npx playwright test --reporter=json,html --workers=1
+          fi
 
       - name: Upload Playwright report
         if: always()
