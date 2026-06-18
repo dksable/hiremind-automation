@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { LoginPage } from "../pages/LoginPage";
-import { loginData } from "../test-data/loginData";
+import { LoginPage } from "../../pages/LoginPage";
+import { loginData } from "../../test-data/loginData";
 
 test.describe("Login page", () => {
   test.skip(!process.env.BASE_URL, "BASE_URL is required to run Login page tests.");
