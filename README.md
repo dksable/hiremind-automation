@@ -1,116 +1,86 @@
 # Hiremind Automation
 
-Playwright TypeScript automation framework for Hiremind, organized with the Page Object Model.
+This repository contains the Playwright automation framework used by AI QA Copilot to validate generated test updates for Hiremind.
 
-## Folder Structure
+AI QA Copilot can push generated Playwright tests into this repository, trigger GitHub Actions validation, read pass/fail results, and create pull requests with test changes.
 
-```text
-├── tests/
-│   ├── e2e/
-│   │   └── smoke.spec.ts
-│   └── login.spec.ts
-├── pages/
-│   └── LoginPage.ts
-├── fixtures/
-├── utils/
-├── test-data/
-│   └── loginData.ts
-├── playwright.config.ts
-├── package.json
-└── README.md
-```
-
-## Prerequisites
-
-- Node.js installed
-- Hiremind frontend running locally, usually at `http://localhost:5173`
-- Hiremind backend running locally, usually at `http://localhost:4000`
-- Valid login credentials seeded in the backend
-
-Default credentials used by the login tests:
-
-```text
-admin@demo.com / admin123
-```
-
-Override credentials when needed:
-
-```bash
-LOGIN_EMAIL="admin@demo.com" LOGIN_PASSWORD="admin123" npm test
-```
-
-## Setup
+## Local Setup
 
 ```bash
 npm install
-npx playwright install chromium
+npx playwright install
 ```
 
-## Run Tests
+## Run Tests Locally
 
-Run all tests in headless Chromium:
+Run all tests:
 
 ```bash
 npm test
 ```
 
-Run tests in headed Chromium:
+Run tests in headed mode:
 
 ```bash
 npm run test:headed
 ```
 
-Run Playwright UI mode:
+Open the HTML report:
 
 ```bash
-npm run test:ui
+npm run test:report
 ```
 
-Type-check the framework:
+## GitHub Actions Validation
 
-```bash
-npm run lint
+The `Playwright Validation` workflow runs when:
+
+- It is manually triggered with `workflow_dispatch`
+- Code is pushed to branches that start with `aiqa/`
+
+The workflow:
+
+- Checks out the repository
+- Sets up Node.js 20
+- Installs dependencies using `npm ci` when `package-lock.json` exists, otherwise `npm install`
+- Installs Playwright browsers
+- Runs Playwright tests
+- Uploads `playwright-report`
+- Uploads `test-results`
+
+The workflow does not run automatically for normal `main` branch pushes.
+
+## Environment Variables
+
+Create a local `.env` file if needed. Do not commit real secrets.
+
+```env
+BASE_URL=https://example.com
+TEST_USER_EMAIL=
+TEST_USER_PASSWORD=
 ```
 
-Open the latest HTML report:
+`BASE_URL` is optional for the sample smoke test. If it is not set, the smoke test uses `https://example.com`.
 
-```bash
-npm run report
-```
-
-## Environment
-
-The default test base URL is:
+## Folder Structure
 
 ```text
-http://localhost:5173
+.github/workflows/playwright-validation.yml
+fixtures/
+pages/
+tests/
+utils/
+.env.example
+.gitignore
+package.json
+playwright.config.ts
+README.md
 ```
 
-Override it when needed:
+## Notes for AI QA Copilot
 
-```bash
-BASE_URL="https://your-app-url.example" npm test
-```
-
-## Framework Features
-
-- Page Object Model
-- Chromium execution
-- HTML reports
-- Screenshots on failure
-- Videos retained on failure
-- Trace collection on retry
-- No hardcoded waits
-- Test data separated from specs
-
-## Adding New Modules
-
-For ATS areas such as Dashboard, Jobs, Candidates, Pipeline, Interview, and Settings:
-
-1. Add a page object in `pages/`, for example `DashboardPage.ts`.
-2. Store reusable data in `test-data/`.
-3. Add shared setup or custom fixtures in `fixtures/`.
-4. Add helpers in `utils/`.
-5. Add specs in `tests/`.
-
-Prefer accessible selectors such as `getByRole`, `getByLabel`, and `getByTestId`.
+- Add generated specs under `tests/`.
+- Add Page Object Model files under `pages/`.
+- Add shared setup under `fixtures/`.
+- Add reusable helpers under `utils/`.
+- Do not commit `.env` files or real credentials.

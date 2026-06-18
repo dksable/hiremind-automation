@@ -2,16 +2,14 @@
   "name": "hiremind-automation",
   "version": "1.0.0",
   "private": true,
-  "description": "Playwright TypeScript automation framework for Hiremind.",
+  "description": "Playwright automation repository for AI QA Copilot validation.",
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
-    "test:ui": "playwright test --ui",
-    "report": "playwright show-report",
-    "lint": "tsc --noEmit"
+    "test:report": "playwright show-report"
   },
   "devDependencies": {
-    "@playwright/test": "^1.60.0",
-    "typescript": "^5.9.3"
+    "@playwright/test": "latest",
+    "typescript": "latest"
   }
 }

@@ -4,22 +4,22 @@ export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 2 : 1,
+  retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [["html", { open: "never" }], ["list"]],
+  reporter: [
+    ["html", { open: "never" }],
+    ["json", { outputFile: "test-results/results.json" }]
+  ],
   use: {
-    baseURL: process.env.BASE_URL ?? "http://localhost:5173",
+    baseURL: process.env.BASE_URL,
     screenshot: "only-on-failure",
-    trace: "on-first-retry",
-    video: "retain-on-failure"
+    video: "retain-on-failure",
+    trace: "retain-on-failure"
   },
   projects: [
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] }
     }
-  ],
-  expect: {
-    timeout: 10_000
-  }
+  ]
 });

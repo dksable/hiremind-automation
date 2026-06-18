@@ -1,9 +1,5 @@
-node_modules/
-test-results/
-playwright-report/
-blob-report/
-coverage/
+node_modules
 .env
-.env.*
-*.log
+playwright-report
+test-results
 .DS_Store
