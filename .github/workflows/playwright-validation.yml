@@ -11,6 +11,15 @@ on:
         description: Validation branch to checkout
         required: false
         default: ""
+      browser:
+        description: Browser to run Playwright validation
+        required: false
+        default: chromium
+        type: choice
+        options:
+          - chromium
+          - firefox
+          - webkit
   push:
     branches:
       - "aiqa/**"
@@ -18,6 +27,9 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      PLAYWRIGHT_BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
+      PLAYWRIGHT_TEST_FILES: ${{ github.event.inputs.test_files || '' }}
 
     steps:
       - name: Checkout repo
@@ -39,14 +51,14 @@ jobs:
           fi
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install "$PLAYWRIGHT_BROWSER" --with-deps
 
       - name: Run Playwright tests
         run: |
-          if [ -n "${{ github.event.inputs.test_files }}" ]; then
-            npx playwright test ${{ github.event.inputs.test_files }} --reporter=json,html --workers=1
+          if [ -n "$PLAYWRIGHT_TEST_FILES" ]; then
+            npx playwright test $PLAYWRIGHT_TEST_FILES --project="$PLAYWRIGHT_BROWSER" --reporter=json,html --workers=1
           else
-            npx playwright test --reporter=json,html --workers=1
+            npx playwright test --project="$PLAYWRIGHT_BROWSER" --reporter=json,html --workers=1
           fi
 
       - name: Upload Playwright report
