@@ -53,6 +53,32 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install "$PLAYWRIGHT_BROWSER" --with-deps
 
+      - name: Print BASE_URL diagnostics
+        run: |
+          echo "BASE_URL=$BASE_URL"
+          node -e "console.log('BASE_URL:', process.env.BASE_URL)"
+
+          node <<'NODE'
+          const fs = require('fs');
+
+          const config = fs.readFileSync('playwright.config.ts', 'utf8');
+          const fallbackMatch = config.match(/baseURL:\s*process\.env\.BASE_URL\s*(?:\|\||\?\?)\s*['"`]([^'"`]+)['"`]/);
+          const resolvedBaseURL = process.env.BASE_URL || fallbackMatch?.[1] || '';
+
+          console.log('Playwright resolved baseURL:', resolvedBaseURL);
+          NODE
+
+          if [ -z "$BASE_URL" ]; then
+            echo "ERROR: BASE_URL is not set"
+            exit 1
+          fi
+
+          if [ -n "$PLAYWRIGHT_TEST_FILES" ]; then
+            echo "Playwright command: npx playwright test $PLAYWRIGHT_TEST_FILES --project=$PLAYWRIGHT_BROWSER --reporter=json,html --workers=1"
+          else
+            echo "Playwright command: npx playwright test --project=$PLAYWRIGHT_BROWSER --reporter=json,html --workers=1"
+          fi
+
       - name: Run Playwright tests
         run: |
           if [ -n "$PLAYWRIGHT_TEST_FILES" ]; then
