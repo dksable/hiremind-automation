@@ -11,7 +11,7 @@ export default defineConfig({
     ["json", { outputFile: "test-results/results.json" }]
   ],
   use: {
-    baseURL: process.env.BASE_URL,
+    baseURL: process.env.BASE_URL || 'https://ai-qa-copilot-frontend.vercel.app',
     screenshot: "only-on-failure",
     video: "retain-on-failure",
     trace: "retain-on-failure"
