@@ -68,11 +68,6 @@ jobs:
           console.log('Playwright resolved baseURL:', resolvedBaseURL);
           NODE
 
-          if [ -z "$BASE_URL" ]; then
-            echo "ERROR: BASE_URL is not set"
-            exit 1
-          fi
-
           if [ -n "$PLAYWRIGHT_TEST_FILES" ]; then
             echo "Playwright command: npx playwright test $PLAYWRIGHT_TEST_FILES --project=$PLAYWRIGHT_BROWSER --reporter=json,html --workers=1"
           else
