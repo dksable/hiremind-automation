@@ -79,7 +79,8 @@ jobs:
           elif [ -n "$PLAYWRIGHT_TEST_FILES" ]; then
             echo "Playwright command: npx playwright test $PLAYWRIGHT_TEST_FILES --project=$BROWSER --reporter=json,html --workers=1"
           else
-            echo "Playwright command: no test files provided for incremental validation"
+            echo "No test files provided for incremental validation. Falling back to full test suite."
+            echo "Playwright command: npx playwright test --project=$BROWSER --reporter=json,html --workers=1"
           fi
 
       - name: Run Playwright tests
@@ -89,12 +90,14 @@ jobs:
           BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
         run: |
           if [ "$VALIDATION_MODE" = "full" ]; then
+            echo "Running full validation..."
             npx playwright test --project=$BROWSER --reporter=json,html --workers=1
           elif [ -n "$PLAYWRIGHT_TEST_FILES" ]; then
+            echo "Running incremental validation for: $PLAYWRIGHT_TEST_FILES"
             npx playwright test $PLAYWRIGHT_TEST_FILES --project=$BROWSER --reporter=json,html --workers=1
           else
-            echo "No test files provided for incremental validation."
-            exit 1
+            echo "No test files provided for incremental validation. Falling back to full test suite."
+            npx playwright test --project=$BROWSER --reporter=json,html --workers=1
           fi
 
       - name: Upload Playwright report
