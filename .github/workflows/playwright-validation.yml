@@ -11,6 +11,10 @@ on:
         description: Validation branch to checkout
         required: false
         default: ""
+      validation_mode:
+        description: "Validation mode: quick, impact, or full"
+        required: false
+        default: "impact"
       browser:
         description: Browser to run Playwright validation
         required: false
@@ -28,8 +32,9 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     env:
-      PLAYWRIGHT_BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
       PLAYWRIGHT_TEST_FILES: ${{ github.event.inputs.test_files || '' }}
+      VALIDATION_MODE: ${{ github.event.inputs.validation_mode || 'impact' }}
+      BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
 
     steps:
       - name: Checkout repo
@@ -51,7 +56,7 @@ jobs:
           fi
 
       - name: Install Playwright browsers
-        run: npx playwright install "$PLAYWRIGHT_BROWSER" --with-deps
+        run: npx playwright install "$BROWSER" --with-deps
 
       - name: Print BASE_URL diagnostics
         run: |
@@ -68,18 +73,28 @@ jobs:
           console.log('Playwright resolved baseURL:', resolvedBaseURL);
           NODE
 
-          if [ -n "$PLAYWRIGHT_TEST_FILES" ]; then
-            echo "Playwright command: npx playwright test $PLAYWRIGHT_TEST_FILES --project=$PLAYWRIGHT_BROWSER --reporter=json,html --workers=1"
+          echo "Validation mode: $VALIDATION_MODE"
+          if [ "$VALIDATION_MODE" = "full" ]; then
+            echo "Playwright command: npx playwright test --project=$BROWSER --reporter=json,html --workers=1"
+          elif [ -n "$PLAYWRIGHT_TEST_FILES" ]; then
+            echo "Playwright command: npx playwright test $PLAYWRIGHT_TEST_FILES --project=$BROWSER --reporter=json,html --workers=1"
           else
-            echo "Playwright command: npx playwright test --project=$PLAYWRIGHT_BROWSER --reporter=json,html --workers=1"
+            echo "Playwright command: no test files provided for incremental validation"
           fi
 
       - name: Run Playwright tests
+        env:
+          PLAYWRIGHT_TEST_FILES: ${{ github.event.inputs.test_files }}
+          VALIDATION_MODE: ${{ github.event.inputs.validation_mode || 'impact' }}
+          BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
         run: |
-          if [ -n "$PLAYWRIGHT_TEST_FILES" ]; then
-            npx playwright test $PLAYWRIGHT_TEST_FILES --project="$PLAYWRIGHT_BROWSER" --reporter=json,html --workers=1
+          if [ "$VALIDATION_MODE" = "full" ]; then
+            npx playwright test --project=$BROWSER --reporter=json,html --workers=1
+          elif [ -n "$PLAYWRIGHT_TEST_FILES" ]; then
+            npx playwright test $PLAYWRIGHT_TEST_FILES --project=$BROWSER --reporter=json,html --workers=1
           else
-            npx playwright test --project="$PLAYWRIGHT_BROWSER" --reporter=json,html --workers=1
+            echo "No test files provided for incremental validation."
+            exit 1
           fi
 
       - name: Upload Playwright report
